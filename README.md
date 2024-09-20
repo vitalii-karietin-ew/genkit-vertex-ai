@@ -10,7 +10,7 @@ https://github.com/user-attachments/assets/34a4c4c4-f6e4-4630-ae59-44e5b8d727a8
 
 ## Preview
 
-In progress...
+[Vercel preview link](https://genkit-vertex-ai.vercel.app/)
 
 ## Features
 
