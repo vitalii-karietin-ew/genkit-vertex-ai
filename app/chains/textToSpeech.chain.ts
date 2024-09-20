@@ -2,6 +2,18 @@ import { TextToSpeechInputType, TextToSpeechOutputType } from "../utils/types";
 import { Runnable, RunnableConfig } from "@langchain/core/runnables";
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 
+type SynthesizeSpeechRequest = {
+	input: {
+		text: string;
+	};
+	voice: {
+		languageCode: string;
+	};
+	audioConfig: {
+		audioEncoding: "MP3";
+	};
+};
+
 export class TextToSpeechChain extends Runnable<TextToSpeechInputType, TextToSpeechOutputType, RunnableConfig> {
 	lc_namespace: string[] = ["TextToSpeechChain"];
 
@@ -12,7 +24,7 @@ export class TextToSpeechChain extends Runnable<TextToSpeechInputType, TextToSpe
 
 			const client = new TextToSpeechClient();
 
-			const request = {
+			const request: SynthesizeSpeechRequest = {
 				input: {
 					text: text
 				},
@@ -20,17 +32,21 @@ export class TextToSpeechChain extends Runnable<TextToSpeechInputType, TextToSpe
 					languageCode: 'en-US',
 				},
 				audioConfig: {
-					audioEncoding: 'MP3'
+					audioEncoding: "MP3"
 				}
 			};
 			const [response] = await client.synthesizeSpeech(request);
 
-			const audioContent = Buffer.isBuffer(response.audioContent)
+			if (!response.audioContent) {
+				throw new Error("No audio content returned from the text to speech service");
+			};
+
+			const audioContent1 = Buffer.isBuffer(response.audioContent)
 				? response.audioContent
 				: Buffer.from(response.audioContent);
 
 			return {
-				audio: audioContent,
+				audio: audioContent1,
 				text
 			}
 		} catch(e) {
